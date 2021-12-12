@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "trace",
+  "version": "1.0.0",
+  "description": "A Cloudflare Worker and Discord Webhook integration for pixel tracking.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Emilie Ma (kewbish)"
+}
