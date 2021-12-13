@@ -9,14 +9,12 @@ addEventListener("fetch", (event) => {
 
 const getLocation = async (ip) => {
     const ipUrl = `http://www.geoplugin.net/json.gp?ip=${ip}`;
-    await fetch(ipUrl)
-        .then((response) => response.json())
-        .then((data) => {
-            return data;
-        })
-        .catch((error) => {
-            return error;
-        });
+    let response = await fetch(ipUrl);
+    if (response.ok) {
+        return await response.json();
+    } else {
+        return await response.error();
+    }
 };
 
 /**
@@ -44,14 +42,14 @@ const handleRequest = async (request) => {
         });
     }
 
-    const ipLocation = getLocation(ip);
+    /*const ipLocation = await getLocation(ip);
     console.log(
         ipLocation,
         ipLocation["geoplugin_request"],
         ipLocation["geoplugin_city"],
         ipLocation["geoplugin_region"],
         ipLocation["geoplugin_countryName"]
-    );
+    );*/
 
     const urlParams = new URL(request.url).searchParams;
     console.log(request.url);
@@ -61,7 +59,7 @@ const handleRequest = async (request) => {
     const notes = (urlParams.get("notes") || "no-notes")
         .replace(/-/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-    console.log(toPerson, notes);
+    // console.log(toPerson, notes);
 
     return new Response(img, {
         headers: { "content-type": "image/gif", "content-length": img.length },
