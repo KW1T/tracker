@@ -42,14 +42,8 @@ const handleRequest = async (request) => {
         });
     }
 
-    /*const ipLocation = await getLocation(ip);
-    console.log(
-        ipLocation,
-        ipLocation["geoplugin_request"],
-        ipLocation["geoplugin_city"],
-        ipLocation["geoplugin_region"],
-        ipLocation["geoplugin_countryName"]
-    );*/
+    const ipLocation = await getLocation(ip);
+    const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation}["geoplugin_countryName"] | ${ipLocation["geoplugin_request"]}`;
 
     const urlParams = new URL(request.url).searchParams;
     console.log(request.url);
@@ -59,7 +53,18 @@ const handleRequest = async (request) => {
     const notes = (urlParams.get("notes") || "no-notes")
         .replace(/-/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-    // console.log(toPerson, notes);
+
+    var embed = {};
+    embed.title = `📨 | ${toPerson} opened an email`;
+    embed.description = `Location: ${ip}`;
+    embed.fields = [
+        { name: "👤", value: toPerson, inline: true },
+        { name: "📝", value: notes, inline: true },
+    ];
+    embed.footer = {
+        text: `Tracked with Trace 🔍`,
+    };
+    embed.color = 2895667;
 
     return new Response(img, {
         headers: { "content-type": "image/gif", "content-length": img.length },
