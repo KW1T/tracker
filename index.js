@@ -12,11 +12,9 @@ const getLocation = async (ip) => {
     await fetch(ipUrl)
         .then((response) => response.json())
         .then((data) => {
-            console.log(data);
             return data;
         })
         .catch((error) => {
-            console.log(error);
             return error;
         });
 };
@@ -39,17 +37,31 @@ const handleRequest = async (request) => {
         (request.connection.socket
             ? request.connection.socket.remoteAddress
             : null);
-    console.log(ip);
-    if (ip) {
-        const ipLocation = getLocation(ip);
-        console.log(
-            ipLocation,
-            ipLocation["geoplugin_request"],
-            ipLocation["geoplugin_city"],
-            ipLocation["geoplugin_region"],
-            ipLocation["geoplugin_countryName"]
-        );
+    if (!ip) {
+        return new Response("No IP found", {
+            headers: { "content-type": "text/plain" },
+            status: 400,
+        });
     }
+
+    const ipLocation = getLocation(ip);
+    console.log(
+        ipLocation,
+        ipLocation["geoplugin_request"],
+        ipLocation["geoplugin_city"],
+        ipLocation["geoplugin_region"],
+        ipLocation["geoplugin_countryName"]
+    );
+
+    const urlParams = new URL(request.url).searchParams;
+    console.log(request.url);
+    const toPerson = (urlParams.get("to") || "no-direct-person")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    const notes = (urlParams.get("notes") || "no-notes")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    console.log(toPerson, notes);
 
     return new Response(img, {
         headers: { "content-type": "image/gif", "content-length": img.length },
