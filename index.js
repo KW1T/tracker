@@ -18,6 +18,21 @@ const getLocation = async (ip) => {
 };
 
 /**
+ * Send webhook
+ * @param {Object} embed
+ */
+
+const sendWebhook = async (embed) => {
+    const embedJSON = JSON.stringify({ embeds: [embed] });
+    let response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: embedJSON,
+    });
+    return response.ok;
+};
+
+/**
  * Respond with 1x1 transparent GIF
  * @param {Request} request
  */
@@ -43,7 +58,7 @@ const handleRequest = async (request) => {
     }
 
     const ipLocation = await getLocation(ip);
-    const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation}["geoplugin_countryName"] | ${ipLocation["geoplugin_request"]}`;
+    const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation["geoplugin_countryName"]} | ${ipLocation["geoplugin_request"]}`;
 
     const urlParams = new URL(request.url).searchParams;
     console.log(request.url);
@@ -56,7 +71,7 @@ const handleRequest = async (request) => {
 
     var embed = {};
     embed.title = `📨 | ${toPerson} opened an email`;
-    embed.description = `Location: ${ip}`;
+    embed.description = `Location: ${ipLocationString}`;
     embed.fields = [
         { name: "👤", value: toPerson, inline: true },
         { name: "📝", value: notes, inline: true },
@@ -65,6 +80,9 @@ const handleRequest = async (request) => {
         text: `Tracked with Trace 🔍`,
     };
     embed.color = 2895667;
+
+    const webhookSent = await sendWebhook(embed);
+    console.log(webhookSent);
 
     return new Response(img, {
         headers: { "content-type": "image/gif", "content-length": img.length },
