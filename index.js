@@ -39,13 +39,17 @@ const sendWebhook = async (embed) => {
 
 const getSearchParams = (url) => {
     const urlParams = url.searchParams;
-    const toPerson = (urlParams.get("to") || "no-direct-person")
+    let returnParams = {};
+    for (var value of urlParams.keys()) {
+        returnParams[value] = urlParams.get(value);
+    }
+    returnParams.to = (returnParams.to || "")
         .replace(/-/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-    const notes = (urlParams.get("notes") || "no-notes")
+    returnParams.notes = (returnParams.notes || "")
         .replace(/-/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
-    return { toPerson: toPerson, notes: notes };
+    return returnParams;
 };
 
 /**
@@ -55,13 +59,35 @@ const getSearchParams = (url) => {
  */
 
 const generateEmbed = (urlParams, ipLocationString) => {
+    const { ["to"]: to, ["notes"]: notes, ...otherParams } = urlParams;
     var embed = {};
-    embed.title = `📨 | ${urlParams.toPerson} opened an email`;
+    embed.title = `📨 | ${to} opened an email`;
     embed.description = `Location: ${ipLocationString}`;
-    embed.fields = [
-        { name: "👤", value: urlParams.toPerson, inline: true },
-        { name: "📝", value: urlParams.notes, inline: true },
-    ];
+    embed.fields = [];
+    if (to) {
+        embed.fields = embed.fields.concat({
+            name: "👤 To",
+            value: to,
+            inline: true,
+        });
+    }
+    if (notes) {
+        embed.fields = embed.fields.concat({
+            name: "📝 Notes",
+            value: notes,
+            inline: true,
+        });
+    }
+    if (otherParams) {
+        let paramString = "";
+        for (const [k, v] of Object.entries(otherParams)) {
+            paramString = paramString.concat(`${k}: ${v}\n`);
+        }
+        embed.fields = embed.fields.concat({
+            name: "✨ Other Values",
+            value: `\`\`\`\n${paramString}\`\`\``,
+        });
+    }
     embed.footer = {
         text: `Tracked with Trace 🔍`,
     };
