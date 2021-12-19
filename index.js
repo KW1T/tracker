@@ -33,6 +33,43 @@ const sendWebhook = async (embed) => {
 };
 
 /**
+ * Get search params
+ * @param {URL} url
+ */
+
+const getSearchParams = (url) => {
+    const urlParams = url.searchParams;
+    const toPerson = (urlParams.get("to") || "no-direct-person")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    const notes = (urlParams.get("notes") || "no-notes")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    return { toPerson: toPerson, notes: notes };
+};
+
+/**
+ * Generate embed
+ * @param {Object} urlParams
+ * @param {String} ipLocationString
+ */
+
+const generateEmbed = (urlParams, ipLocationString) => {
+    var embed = {};
+    embed.title = `📨 | ${urlParams.toPerson} opened an email`;
+    embed.description = `Location: ${ipLocationString}`;
+    embed.fields = [
+        { name: "👤", value: urlParams.toPerson, inline: true },
+        { name: "📝", value: urlParams.notes, inline: true },
+    ];
+    embed.footer = {
+        text: `Tracked with Trace 🔍`,
+    };
+    embed.color = 2895667;
+    return embed;
+};
+
+/**
  * Respond with 1x1 transparent GIF
  * @param {Request} request
  */
@@ -60,29 +97,11 @@ const handleRequest = async (request) => {
     const ipLocation = await getLocation(ip);
     const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation["geoplugin_countryName"]} | ${ipLocation["geoplugin_request"]}`;
 
-    const urlParams = new URL(request.url).searchParams;
-    console.log(request.url);
-    const toPerson = (urlParams.get("to") || "no-direct-person")
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase());
-    const notes = (urlParams.get("notes") || "no-notes")
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase());
+    const urlParams = getSearchParams(new URL(request.url));
 
-    var embed = {};
-    embed.title = `📨 | ${toPerson} opened an email`;
-    embed.description = `Location: ${ipLocationString}`;
-    embed.fields = [
-        { name: "👤", value: toPerson, inline: true },
-        { name: "📝", value: notes, inline: true },
-    ];
-    embed.footer = {
-        text: `Tracked with Trace 🔍`,
-    };
-    embed.color = 2895667;
+    const embed = generateEmbed(urlParams, ipLocationString);
 
-    const webhookSent = await sendWebhook(embed);
-    console.log(webhookSent);
+    await sendWebhook(embed);
 
     return new Response(img, {
         headers: { "content-type": "image/gif", "content-length": img.length },
