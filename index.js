@@ -59,7 +59,12 @@ const getSearchParams = (url) => {
  */
 
 const generateEmbed = (urlParams, ipLocationString) => {
-    const { ["to"]: to, ["notes"]: notes, ...otherParams } = urlParams;
+    const {
+        ["to"]: to,
+        ["notes"]: notes,
+        ["exclude"]: exclude,
+        ...otherParams
+    } = urlParams;
     var embed = {};
     embed.title = `📨 | ${to} opened an email`;
     embed.description = `Location: ${ipLocationString}`;
@@ -124,6 +129,19 @@ const handleRequest = async (request) => {
     const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation["geoplugin_countryName"]} | ${ipLocation["geoplugin_request"]}`;
 
     const urlParams = getSearchParams(new URL(request.url));
+
+    const city = ipLocation["geoplugin_city"];
+    if (
+        urlParams.exclude &&
+        urlParams.exclude.indexOf(city.toLowerCase()) != -1
+    ) {
+        return new Response(img, {
+            headers: {
+                "content-type": "image/gif",
+                "content-length": img.length,
+            },
+        });
+    }
 
     const embed = generateEmbed(urlParams, ipLocationString);
 
