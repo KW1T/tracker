@@ -9,4 +9,4 @@ compatibility_date = "2021-12-11"
 
 [vars]
 # !!! webhook url here !!!
-DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/123/w3bh00k_t0k3n"
+# DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/123/w3bh00k_t0k3n"
