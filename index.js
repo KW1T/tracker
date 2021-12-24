@@ -66,7 +66,7 @@ const generateEmbed = (urlParams, ipLocationString) => {
         ...otherParams
     } = urlParams;
     var embed = {};
-    embed.title = `📨 | ${to} opened an email`;
+    embed.title = `📨 | ${to ? to : "Someone"} opened an email`;
     embed.description = `Location: ${ipLocationString}`;
     embed.fields = [];
     if (to) {
@@ -83,7 +83,8 @@ const generateEmbed = (urlParams, ipLocationString) => {
             inline: true,
         });
     }
-    if (otherParams) {
+    if (Object.keys(otherParams).length !== 0) {
+        console.log(otherParams);
         let paramString = "";
         for (const [k, v] of Object.entries(otherParams)) {
             paramString = paramString.concat(`${k}: ${v}\n`);
