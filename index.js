@@ -40,7 +40,8 @@ const sendWebhook = async (embed) => {
 const urlBtoa = (url) => {
     let urlObj = new URL(url);
     const decodedUrlPart = atob(urlObj.pathname.slice(1));
-    urlObj.pathname = "/" + decodedUrlPart;
+    urlObj.pathname = "/";
+    urlObj.search = "?" + decodedUrlPart;
     return urlObj;
 };
 
