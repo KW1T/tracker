@@ -33,6 +33,18 @@ const sendWebhook = async (embed) => {
 };
 
 /**
+ * Turn Base64 encoded URL string to actual URL
+ * @param {URL} url
+ */
+
+const urlBtoa = (url) => {
+    let urlObj = new URL(url);
+    const decodedUrlPart = atob(urlObj.pathname.slice(1));
+    urlObj.pathname = "/" + decodedUrlPart;
+    return urlObj;
+};
+
+/**
  * Get search params
  * @param {URL} url
  */
@@ -129,7 +141,8 @@ const handleRequest = async (request) => {
     const ipLocation = await getLocation(ip);
     const ipLocationString = `${ipLocation["geoplugin_city"]}, ${ipLocation["geoplugin_region"]}, ${ipLocation["geoplugin_countryName"]} | ${ipLocation["geoplugin_request"]}`;
 
-    const urlParams = getSearchParams(new URL(request.url));
+    const decodedUrl = urlBtoa(request.url);
+    const urlParams = getSearchParams(decodedUrl);
 
     const city = ipLocation["geoplugin_city"];
     if (
