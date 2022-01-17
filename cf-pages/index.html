@@ -87,6 +87,7 @@
                                 class="form-control"
                                 rows="3"
                                 readonly
+                                id="output"
                             ></textarea>
                         </div>
                     </div>
@@ -96,4 +97,33 @@
     </body>
 </html>
 
-<script></script>
+<script>
+    const name = document.getElementById("name");
+    const notes = document.getElementById("notes");
+    const otherInfo = document.getElementById("other-info");
+    const output = document.getElementById("output");
+
+    const fixCase = (str) => str.replace(/\s+/g, "-").toLowerCase();
+
+    const generateTag = (nameS, notesS, otherInfoS) => {
+        console.log(nameS);
+        var params = `?to=${fixCase(nameS)}&notes=${fixCase(notesS)}`;
+        if (otherInfoS !== "") {
+            const kvPairs = otherInfoS.split(",");
+            const kvString = kvPairs
+                .map((k, v) => `${k}=${fixCase(v)}`)
+                .join("&");
+            params.concat(kvString);
+        }
+        return `trace.workers.dev/${btoa(params)}`;
+    };
+    const nameInputHandler = (e) => {
+        output.innerHTML = generateTag(
+            e.target.value,
+            notes.value,
+            otherInfo.value
+        );
+    };
+    name.addEventListener("input", nameInputHandler);
+    name.addEventListener("propertychange", nameInputHandler);
+</script>
