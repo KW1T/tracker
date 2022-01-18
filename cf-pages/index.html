@@ -89,6 +89,9 @@
                                 readonly
                                 id="output"
                             ></textarea>
+                            <small class="form-text text-muted"
+                                ><code id="decoded"></code
+                            ></small>
                         </div>
                     </div>
                 </div>
@@ -119,7 +122,10 @@
                 .join("&");
             params = params.concat("&" + kvString);
         }
-        decodedOutput.innerHTML = `trace.workers.dev/${params}`;
+        decodedOutput.innerHTML = `https://trace.kewbish.workers.dev/[${params.replace(
+            "&",
+            "&amp;"
+        )}]`;
         return `https://trace.kewbish.workers.dev/${btoa(params)}`;
     };
     const nameInputHandler = (e) => {
