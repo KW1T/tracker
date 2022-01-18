@@ -102,12 +102,12 @@
     const notes = document.getElementById("notes");
     const otherInfo = document.getElementById("other-info");
     const output = document.getElementById("output");
+    const decodedOutput = document.getElementById("decoded");
 
     const fixCase = (str) => str.replace(/\s+/g, "-").toLowerCase();
 
     const generateTag = (nameS, notesS, otherInfoS) => {
-        var params = `?to=${fixCase(nameS)}&notes=${fixCase(notesS)}`;
-        console.log(otherInfoS);
+        var params = `to=${fixCase(nameS)}&notes=${fixCase(notesS)}`;
         if (otherInfoS !== "") {
             const kvPairs = otherInfoS.split(",");
             const kvString = kvPairs
@@ -119,7 +119,8 @@
                 .join("&");
             params = params.concat("&" + kvString);
         }
-        return `trace.workers.dev/${btoa(params)}`;
+        decodedOutput.innerHTML = `trace.workers.dev/${params}`;
+        return `https://trace.kewbish.workers.dev/${btoa(params)}`;
     };
     const nameInputHandler = (e) => {
         output.innerHTML = generateTag(
