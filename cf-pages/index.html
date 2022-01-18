@@ -59,6 +59,20 @@
                                 />
                             </div>
                             <div class="form-group">
+                                <label for="notes">Cities</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="cities"
+                                    placeholder="Cities"
+                                />
+                                <small class="form-text text-muted"
+                                    >This excludes any city names inputted from
+                                    tracking notifications. Comma-separated
+                                    values for multiple cities.</small
+                                >
+                            </div>
+                            <div class="form-group">
                                 <label for="other-info"
                                     >Other Information</label
                                 >
@@ -103,14 +117,21 @@
 <script>
     const name = document.getElementById("name");
     const notes = document.getElementById("notes");
+    const cities = document.getElementById("cities");
     const otherInfo = document.getElementById("other-info");
     const output = document.getElementById("output");
     const decodedOutput = document.getElementById("decoded");
 
     const fixCase = (str) => str.replace(/\s+/g, "-").toLowerCase();
 
-    const generateTag = (nameS, notesS, otherInfoS) => {
-        var params = `to=${fixCase(nameS)}&notes=${fixCase(notesS)}`;
+    const generateTag = (nameS, notesS, citiesS, otherInfoS) => {
+        var params = `to=${fixCase(nameS)}`;
+        if (notesS !== "") {
+            params = params.concat(`&notes=${fixCase(notesS)}`);
+        }
+        if (citiesS !== "") {
+            params = params.concat(`&exclude=${citiesS}`);
+        }
         if (otherInfoS !== "") {
             const kvPairs = otherInfoS.split(",");
             const kvString = kvPairs
@@ -132,12 +153,22 @@
         output.innerHTML = generateTag(
             e.target.value,
             notes.value,
+            cities.value,
             otherInfo.value
         );
     };
     const notesInputHandler = (e) => {
         output.innerHTML = generateTag(
             name.value,
+            e.target.value,
+            cities.value,
+            otherInfo.value
+        );
+    };
+    const citiesInputHandler = (e) => {
+        output.innerHTML = generateTag(
+            name.value,
+            notes.value,
             e.target.value,
             otherInfo.value
         );
@@ -149,6 +180,8 @@
     name.addEventListener("propertychange", nameInputHandler);
     notes.addEventListener("input", notesInputHandler);
     notes.addEventListener("propertychange", notesInputHandler);
+    cities.addEventListener("input", citiesInputHandler);
+    cities.addEventListener("propertychange", citiesInputHandler);
     otherInfo.addEventListener("input", otherInfoInputHandler);
     otherInfo.addEventListener("propertychange", otherInfoInputHandler);
 </script>
